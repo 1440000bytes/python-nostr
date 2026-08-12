@@ -3,12 +3,17 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nostr"
+# Published to PyPI as "nostrj"; the import package stays "nostr", so
+# `pip install nostrj` still gives `import nostr`.
+name = "nostrj"
 authors = [
   { name="Jeff Thibault", email="jdthibault2@gmail.com" },
 ]
+maintainers = [
+  { name="/dev/fd0", email="alicexbt@protonmail.com" },
+]
 description = "A Python library for making Nostr clients"
-urls = { Homepage = "https://github.com/jeffthibault/python-nostr" }
+urls = { Homepage = "https://github.com/1440000bytes/python-nostr" }
 readme = "README.md"
 requires-python = ">3.6.0"
 dependencies = [
@@ -26,6 +31,9 @@ classifiers=[
     'Operating System :: MacOS :: MacOS X',
 ]
 dynamic=["version"]
+
+[tool.setuptools]
+packages = ["nostr"]
 
 [tool.setuptools_scm]
 write_to = "nostr/_version.py"

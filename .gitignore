@@ -1,6 +1,8 @@
 venv/
 __pycache__/
 nostr.egg-info/
+nostrj.egg-info/
+*.egg-info/
 dist/
 nostr/_version.py
 .DS_Store
