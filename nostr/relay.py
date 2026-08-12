@@ -121,6 +121,8 @@ class Relay:
         self.connected = False
 
     def _on_message(self, class_obj, message: str):
+        if not self._is_valid_message(message):
+            return
         self.message_pool.add_message(message, self.url)
     
     def _on_error(self, class_obj, error):
@@ -132,6 +134,20 @@ class Relay:
             self.check_reconnect()
 
     def _is_valid_message(self, message: str) -> bool:
+        """Whether a frame from the relay may be queued.
+
+        A relay is untrusted: it can forge, replay or reorder anything it sends.
+        This rejects frames that are malformed, belong to no live subscription,
+        carry an invalid signature, or do not match the filters the caller asked
+        for. Anything that raises while being examined is rejected rather than
+        allowed through.
+        """
+        try:
+            return self._check_message(message)
+        except Exception:
+            return False
+
+    def _check_message(self, message: str) -> bool:
         message = message.strip("\n")
         if not message or message[0] != "[" or message[-1] != "]":
             return False
