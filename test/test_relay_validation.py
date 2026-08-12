@@ -94,6 +94,27 @@ class TestMalformedFramesAreRejectedNotRaised:
     def test_notices_still_pass(self, relay):
         assert relay._is_valid_message('["NOTICE","hello"]') is True
 
+    def test_eose_still_passes(self, relay):
+        assert relay._is_valid_message('["EOSE","sub1"]') is True
+
+    @pytest.mark.parametrize("frame", [
+        '["OK","event-id",true,""]',
+        '["OK","event-id",false,"rate-limited"]',
+    ])
+    def test_nip20_command_results_pass(self, relay, frame):
+        # Clients wait on these to confirm a relay accepted a published event.
+        # Dropping them here would make every publish look unconfirmed.
+        assert relay._is_valid_message(frame) is True
+
+    def test_an_unknown_message_type_is_rejected(self, relay):
+        assert relay._is_valid_message('["WAT","x"]') is False
+
+    def test_an_ok_frame_survives_the_message_pool(self):
+        from nostr.message_pool import MessagePool
+        pool = MessagePool()
+        pool.add_message('["OK","abc",true,""]', "wss://x")  # must not raise
+        assert pool.has_events() is False
+
 
 class TestReceivePathIsGuarded:
     def test_on_message_drops_a_forged_event(self, relay):
